@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Țările Lumii</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .checkout-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .checkout-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+        }
+
+        .form-section {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .payment-option {
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #000 !important; /* Text negru */
+        }
+
+        .payment-option:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+
+        .payment-option.selected {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+
+        .payment-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .payment-option label {
+            color: #000 !important; /* Text negru pentru label */
+            margin-bottom: 0;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .payment-option strong {
+            color: #000 !important; /* Text negru pentru titlu */
+        }
+
+        .payment-icon {
+            font-size: 24px;
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .order-summary {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 15px;
+        }
+
+        .summary-item-details {
+            flex: 1;
+        }
+
+        .summary-item-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .summary-item-price {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .summary-totals {
+            border-top: 2px solid #dee2e6;
+            margin-top: 20px;
+            padding-top: 15px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .summary-row.total {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2c3e50;
+            border-top: 1px solid #dee2e6;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .place-order-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .place-order-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .security-notice {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .required-field {
+            color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .form-section {
+                padding: 20px;
+            }
+            
+            .checkout-header {
+                padding: 15px 20px;
+            }
+            
+            .order-summary {
+                position: static;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'lista_tari' %}">Țările Lumii</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'vezi_cos' %}">
+                    <i class="fas fa-arrow-left me-1"></i>Înapoi la coș
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'lista_tari' %}">Acasă</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'vezi_cos' %}">Coș</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+            </ol>
+        </nav>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="checkout-container">
+                    <div class="checkout-header">
+                        <h2 class="mb-0">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Finalizează comanda
+                        </h2>
+                    </div>
+
+                    <form method="post" id="checkout-form">
+                        {% csrf_token %}
+                        
+                        <!-- Informații contact -->
+                        <div class="form-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-user"></i>
+                                Informații de contact
+                            </h4>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_email" class="form-label">
+                                        Email <span class="required-field">*</span>
+                                    </label>
+                                    <input type="email" class="form-control" id="id_email" name="email" 
+                                           placeholder="adresa@email.com" required>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_telefon" class="form-label">
+                                        Telefon <span class="required-field">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="id_telefon" name="telefon" 
+                                           placeholder="0721123456" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informații livrare -->
+                        <div class="form-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-truck"></i>
+                                Informații de livrare
+                            </h4>
+                            
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label for="id_nume_complet" class="form-label">
+                                        Nume complet <span class="required-field">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="id_nume_complet" name="nume_complet" 
+                                           placeholder="Numele complet" required>
+                                </div>
+                                
+                                <div class="col-12 mb-3">
+                                    <label for="id_adresa" class="form-label">
+                                        Adresa <span class="required-field">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="id_adresa" name="adresa" 
+                                           placeholder="Strada, numărul, etc." required>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="id_oras" class="form-label">
+                                        Oraș <span class="required-field">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="id_oras" name="oras" 
+                                           placeholder="București" required>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="id_judet" class="form-label">
+                                        Județ <span class="required-field">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="id_judet" name="judet" 
+                                           placeholder="Ilfov" required>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="id_cod_postal" class="form-label">
+                                        Cod poștal <span class="required-field">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="id_cod_postal" name="cod_postal" 
+                                           placeholder="123456" required>
+                                </div>
+                                
+                                <div class="col-12 mb-3">
+                                    <label for="id_observatii_livrare" class="form-label">
+                                        Observații livrare (opțional)
+                                    </label>
+                                    <textarea class="form-control" id="id_observatii_livrare" name="observatii_livrare" 
+                                              rows="3" placeholder="Observații pentru curier (opțional)"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Metoda de plată -->
+                        <div class="form-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-credit-card"></i>
+                                Metoda de plată
+                            </h4>
+                            
+                            <div class="payment-methods">
+                                <div class="payment-option" onclick="selectPayment('card')">
+                                    <input type="radio" id="id_metoda_plata_0" name="metoda_plata" value="card" class="form-check-input">
+                                    <label for="id_metoda_plata_0">
+                                        <i class="fas fa-credit-card payment-icon"></i>
+                                        <strong>Card bancar</strong>
+                                        <div class="text-muted small">Visa, Mastercard, American Express</div>
+                                    </label>
+                                </div>
+                                
+                                <div class="payment-option" onclick="selectPayment('ramburs')">
+                                    <input type="radio" id="id_metoda_plata_1" name="metoda_plata" value="ramburs" class="form-check-input">
+                                    <label for="id_metoda_plata_1">
+                                        <i class="fas fa-truck payment-icon"></i>
+                                        <strong>Ramburs</strong>
+                                        <div class="text-muted small">Plătești la livrare (+ 5 RON taxa)</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Termeni și condiții -->
+                        <div class="form-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-file-contract"></i>
+                                Termeni și condiții
+                            </h4>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="id_accepta_termeni" name="accepta_termeni" required>
+                                <label class="form-check-label" for="id_accepta_termeni">
+                                    Accept <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="text-primary">termenii și condițiile</a> <span class="required-field">*</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="id_newsletter" name="newsletter">
+                                <label class="form-check-label" for="id_newsletter">
+                                    Vreau să primesc oferte prin email
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <h4 class="mb-3">Sumar comandă</h4>
+                    
+                    <!-- Produse în coș -->
+                    {% for item in items %}
+                        <div class="summary-item">
+                            {% if item.produs.imagine_principala %}
+                                <img src="{{ item.produs.imagine_principala.url }}" alt="{{ item.produs.nume }}">
+                            {% else %}
+                                <div style="width: 50px; height: 50px; background: #f8f9fa; border-radius: 6px; margin-right: 15px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-image text-muted"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="summary-item-details">
+                                <div class="summary-item-name">{{ item.produs.nume }}</div>
+                                <div class="summary-item-price">
+                                    {{ item.cantitate }}x {{ item.pret_unitar }} RON
+                                </div>
+                            </div>
+                            
+                            <div class="fw-bold">
+                                {{ item.total_pret }} RON
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <!-- Totaluri -->
+                    <div class="summary-totals">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">{{ subtotal }} RON</span>
+                        </div>
+                        
+                        <div class="summary-row" id="delivery-row">
+                            <span>Livrare:</span>
+                            <span id="delivery-cost">
+                                {% if cost_livrare == 0 %}
+                                    <span class="text-success">GRATUIT</span>
+                                {% else %}
+                                    {{ cost_livrare }} RON
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="summary-row" id="cod-fee-row" style="display: none;">
+                            <span>Taxa ramburs:</span>
+                            <span id="cod-fee">5 RON</span>
+                        </div>
+                        
+                        <div class="summary-row total">
+                            <span>Total de plată:</span>
+                            <span id="total-amount">{{ total }} RON</span>
+                        </div>
+                    </div>
+
+                    <!-- Buton comandă -->
+                    <button type="submit" form="checkout-form" class="place-order-btn" id="place-order-btn">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Plasează comanda
+                    </button>
+
+                    <!-- Notificare securitate -->
+                    <div class="security-notice">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        <small>Datele tale sunt protejate prin criptare SSL</small>
+                    </div>
+
+                    <!-- Informații livrare -->
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="mb-2">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Informații livrare
+                        </h6>
+                        <ul class="list-unstyled mb-0 small">
+                            <li><i class="fas fa-truck me-2 text-primary"></i>Livrare în 2-3 zile lucrătoare</li>
+                            <li><i class="fas fa-box me-2 text-primary"></i>Livrare gratuită pentru comenzi peste 100 RON</li>
+                            <li><i class="fas fa-undo me-2 text-primary"></i>Retur gratuit în 30 de zile</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pentru termeni și condiții -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="termsModalLabel">Termeni și Condiții</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>1. Acceptarea termenilor</h6>
+                    <p>Prin utilizarea acestui site și plasarea unei comenzi, acceptați termenii și condițiile de mai jos.</p>
+                    
+                    <h6>2. Produse și prețuri</h6>
+                    <p>Toate produsele și prețurile afișate sunt valabile în limita stocului disponibil. Ne rezervăm dreptul de a modifica prețurile fără notificare prealabilă.</p>
+                    
+                    <h6>3. Livrare</h6>
+                    <p>Livrarea se face în 2-3 zile lucrătoare pentru comenzile plasate înainte de ora 16:00. Costul livrării este de 15 RON pentru comenzile sub 100 RON.</p>
+                    
+                    <h6>4. Retur și garanție</h6>
+                    <p>Produsele pot fi returnate în termen de 30 de zile de la data livrării, în ambalajul original și în stare perfectă.</p>
+                    
+                    <h6>5. Protecția datelor</h6>
+                    <p>Datele personale sunt protejate conform GDPR și nu sunt partajate cu terți fără acordul dumneavoastră.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Închide</button>
+                    <button type="button" class="btn btn-primary" onclick="acceptTerms()">Accept termenii</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;">
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Se procesează...</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variabile globale pentru calcule
+        let subtotal = {{ subtotal }};
+        let deliveryCost = {{ cost_livrare }};
+        let codFee = 5;
+        
+        // Selectarea metodei de plată
+        function selectPayment(method) {
+            // Deselectează toate opțiunile
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Selectează opțiunea curentă
+            const radio = document.querySelector(`input[value="${method}"]`);
+            radio.checked = true;
+            radio.closest('.payment-option').classList.add('selected');
+            
+            // Actualizează totalul în funcție de metodă
+            updateTotal();
+        }
+        
+        // Actualizarea totalului
+        function updateTotal() {
+            let total = subtotal + deliveryCost;
+            
+            // Verifică dacă este selectat rambursul
+            const selectedPayment = document.querySelector('input[name="metoda_plata"]:checked');
+            if (selectedPayment && selectedPayment.value === 'ramburs') {
+                total += codFee;
+                document.getElementById('cod-fee-row').style.display = 'flex';
+            } else {
+                document.getElementById('cod-fee-row').style.display = 'none';
+            }
+            
+            // Actualizează afișajul
+            document.getElementById('total-amount').textContent = `${total.toFixed(2)} RON`;
+        }
+        
+        // Acceptarea termenilor
+        function acceptTerms() {
+            document.getElementById('id_accepta_termeni').checked = true;
+            bootstrap.Modal.getInstance(document.getElementById('termsModal')).hide();
+        }
+        
+        // Afișarea alertelor
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.row'));
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+        
+        // Validarea formularului
+        document.getElementById('checkout-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = this;
+            const formData = new FormData(form);
+            
+            // Validare de bază
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            if (!document.getElementById('id_accepta_termeni').checked) {
+                showAlert('Trebuie să acceptați termenii și condițiile.', 'danger');
+                return;
+            }
+            
+            if (!isValid) {
+                showAlert('Vă rugăm să completați toate câmpurile obligatorii.', 'danger');
+                return;
+            }
+            
+            // Afișează loading
+            document.getElementById('loading-overlay').style.display = 'block';
+            document.getElementById('place-order-btn').disabled = true;
+            
+            // Trimite formularul
+            fetch(form.action || window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Comanda a fost plasată cu succes!', 'success');
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url || '/';
+                    }, 2000);
+                } else {
+                    showAlert(data.message || 'A apărut o eroare. Vă rugăm să încercați din nou.', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('A apărut o eroare de conexiune. Vă rugăm să încercați din nou.', 'danger');
+            })
+            .finally(() => {
+                document.getElementById('loading-overlay').style.display = 'none';
+                document.getElementById('place-order-btn').disabled = false;
+            });
+        });
+        
+        // Event listeners pentru validare în timp real
+        document.querySelectorAll('.form-control').forEach(field => {
+            field.addEventListener('blur', function() {
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        });
+        
+        // Validare email
+        document.getElementById('id_email').addEventListener('blur', function() {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (this.value && !emailRegex.test(this.value)) {
+                this.classList.add('is-invalid');
+                showAlert('Adresa de email nu este validă.', 'warning');
+            }
+        });
+        
+        // Validare telefon
+        document.getElementById('id_telefon').addEventListener('blur', function() {
+            const phoneRegex = /^[0-9+\-\s()]+$/;
+            if (this.value && !phoneRegex.test(this.value)) {
+                this.classList.add('is-invalid');
+                showAlert('Numărul de telefon conține caractere nevalide.', 'warning');
+            }
+        });
+        
+        // Inițializare
+        document.addEventListener('DOMContentLoaded', function() {
+            // Selectează prima metodă de plată implicit
+            const firstPaymentOption = document.querySelector('input[name="metoda_plata"]');
+            if (firstPaymentOption) {
+                firstPaymentOption.checked = true;
+                firstPaymentOption.closest('.payment-option').classList.add('selected');
+            }
+            
+            // Actualizează totalul inițial
+            updateTotal();
+            
+            // Event listener pentru schimbarea metodei de plată
+            document.querySelectorAll('input[name="metoda_plata"]').forEach(radio => {
+                radio.addEventListener('change', updateTotal);
+            });
+        });
+    </script>
+</body>
+</html>

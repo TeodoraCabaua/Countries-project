@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ tara.nume }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f5e8d3;
+            background-image: url("{% static 'img/background.jpg' %}");
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+        
+        .main-content {
+            width: 100%;
+            position: relative;
+        }
+        
+        /* Add this to ensure content is readable over the background */
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* Make navbar stand out from background */
+        .navbar {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Make footer stand out from background */
+        footer {
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* Carousel styling */
+        .carousel-item img {
+            height: 400px;
+            object-fit: cover;
+        }
+        
+        .carousel-caption {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'lista_tari' %}">Țările Lumii</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- Search bar -->
+                    <form class="d-flex ms-auto" action="{% url 'cauta_tara' %}" method="GET">
+                        <input class="form-control me-2" type="search" placeholder="Caută țară..." name="q" aria-label="Search">
+                        <button class="btn btn-light" type="submit">Caută</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="container mt-4">
+            <div class="mb-4">
+                <a href="{% url 'lista_tari' %}" class="btn btn-secondary">← Înapoi la lista țărilor</a>
+            </div>
+
+            <h1 class="text-center mb-4">{{ tara.nume }}</h1>
+
+            <div class="row mb-4">
+                <div class="col-md-8 mx-auto">
+                    <div id="taraImagesCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% if tara.img1 %}
+                            <div class="carousel-item active">
+                                <img src="{{ tara.img1.url }}" class="d-block w-100" alt="{{ tara.nume }} - Imagine 1">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>{{ tara.nume }}</h5>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if tara.img2 %}
+                            <div class="carousel-item">
+                                <img src="{{ tara.img2.url }}" class="d-block w-100" alt="{{ tara.nume }} - Imagine 2">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>{{ tara.nume }}</h5>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if tara.img3 %}
+                            <div class="carousel-item">
+                                <img src="{{ tara.img3.url }}" class="d-block w-100" alt="{{ tara.nume }} - Imagine 3">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>{{ tara.nume }}</h5>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <button class="carousel-control-prev" type="button" data-bs-target="#taraImagesCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#taraImagesCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+        
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">Informații despre {{ tara.nume }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>ȚARĂ</th>
+                                    <td>{{ tara.nume }}</td>
+                                </tr>
+                                <tr>
+                                    <th>CAPITALĂ</th>
+                                    <td>{{ tara.capitala }}</td>
+                                </tr>
+                                <tr>
+                                    <th>POPULAȚIE</th>
+                                    <td>{{ tara.populatie }}</td>
+                                </tr>
+                                <tr>
+                                    <th>SUPRAFAȚĂ (km²)</th>
+                                    <td>{{ tara.suprafata }}</td>
+                                </tr>
+                                <tr>
+                                    <th>ÎNĂLȚIME MAXIMĂ (m)</th>
+                                    <td>{{ tara.inaltime_maxima }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-striped">
+                                <tr>
+                                    <th>ÎNĂLȚIME MINIMĂ (m)</th>
+                                    <td>{{ tara.inaltime_minima }}</td>
+                                </tr>
+                                <tr>
+                                    <th>CEL MAI MARE ORAȘ</th>
+                                    <td>{{ tara.cel_mai_mare_oras }}</td>
+                                </tr>
+                                <tr>
+                                    <th>MONEDA OFICIALĂ</th>
+                                    <td>{{ tara.moneda }}</td>
+                                </tr>
+                                <tr>
+                                    <th>CEA MAI VORBITĂ LIMBĂ</th>
+                                    <td>{{ tara.limba }}</td>
+                                </tr>
+                                <tr>
+                                    <th>SISTEM POLITIC</th>
+                                    <td>{{ tara.sistem_politic }}</td>
+                                </tr>
+                                <tr>
+                                    <th>CONDUCĂTOR</th>
+                                    <td>{{ tara.conducator }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="bg-dark text-white mt-5 py-3">
+            <div class="container text-center">
+                <p>&copy; 2025 Țările Lumii</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

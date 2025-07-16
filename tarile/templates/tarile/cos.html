@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coșul meu - Țările Lumii</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .cart-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .cart-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+        }
+
+        .cart-item {
+            border-bottom: 1px solid #eee;
+            padding: 20px 30px;
+            transition: background-color 0.3s ease;
+        }
+
+        .cart-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .quantity-input {
+            width: 60px;
+            height: 35px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+        }
+
+        .remove-btn {
+            color: #dc3545;
+            border: none;
+            background: none;
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            color: #c82333;
+        }
+
+        .cart-summary {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid #dee2e6;
+            margin-top: 15px;
+            padding-top: 15px;
+            font-weight: bold;
+            font-size: 20px;
+            color: #2c3e50;
+        }
+
+        .checkout-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .continue-shopping {
+            color: #6c757d;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .continue-shopping:hover {
+            color: #495057;
+            text-decoration: none;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 60px 30px;
+            color: #6c757d;
+        }
+
+        .empty-cart i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .shipping-notice {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .shipping-notice.free {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        @media (max-width: 768px) {
+            .cart-item {
+                padding: 15px 20px;
+            }
+            
+            .cart-header {
+                padding: 15px 20px;
+            }
+            
+            .cart-summary {
+                position: static;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'lista_tari' %}">Țările Lumii</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="magazinDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Magazin
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="magazinDropdown">
+                            <li><a class="dropdown-item" href="{% url 'lista_produse' %}">Vezi toate produsele</a></li>
+                            <li><a class="dropdown-item" href="#">Suveniruri</a></li>
+                            <li><a class="dropdown-item" href="#">Rezervă o vacanță</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'vezi_cos' %}">
+                            <i class="fas fa-shopping-cart"></i>
+                            Coș ({{ cos.total_produse }})
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'lista_tari' %}">Acasă</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Coșul meu</li>
+            </ol>
+        </nav>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="cart-container">
+                    <div class="cart-header">
+                        <h2 class="mb-0">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            Coșul meu de cumpărături
+                        </h2>
+                    </div>
+
+                    {% if items %}
+                        <form method="post" action="{% url 'actualizeaza_cos' %}" id="cart-form">
+                            {% csrf_token %}
+                            {% for item in items %}
+                                <div class="cart-item" data-item-id="{{ item.id }}">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-2 col-3">
+                                            {% if item.produs.imagine_principala %}
+                                                <img src="{{ item.produs.imagine_principala.url }}" 
+                                                     alt="{{ item.produs.nume }}" 
+                                                     class="product-image">
+                                            {% else %}
+                                                <div class="product-image bg-light d-flex align-items-center justify-content-center">
+                                                    <i class="fas fa-image text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="col-md-4 col-9">
+                                            <div class="product-name">{{ item.produs.nume }}</div>
+                                            <div class="text-muted small">
+                                                {% if item.produs.tara_origine %}
+                                                    <i class="fas fa-map-marker-alt me-1"></i>{{ item.produs.tara_origine }}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-2 col-4">
+                                            <div class="product-price">{{ item.pret_unitar }} RON</div>
+                                            {% if item.produs.pret_redus and item.produs.pret_redus < item.produs.pret %}
+                                                <small class="text-muted text-decoration-line-through">
+                                                    {{ item.produs.pret }} RON
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="col-md-3 col-4">
+                                            <div class="quantity-controls">
+                                                <button type="button" class="quantity-btn" onclick="decreaseQuantity({{ item.id }})">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <input type="number" 
+                                                       name="cantitate_{{ item.id }}" 
+                                                       value="{{ item.cantitate }}" 
+                                                       min="1" max="10" 
+                                                       class="quantity-input"
+                                                       id="quantity-{{ item.id }}">
+                                                <button type="button" class="quantity-btn" onclick="increaseQuantity({{ item.id }})">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-1 col-4 text-end">
+                                            <button type="button" class="remove-btn" onclick="removeItem({{ item.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mt-2">
+                                        <div class="col-12 text-end">
+                                            <strong>Subtotal: <span class="text-danger">{{ item.total_pret }} RON</span></strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            
+                            <div class="p-3 bg-light">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fas fa-sync me-2"></i>Actualizează coșul
+                                </button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="empty-cart">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h4>Coșul tău este gol</h4>
+                            <p>Nu ai adăugat încă niciun produs în coș.</p>
+                            <a href="{% url 'lista_produse' %}" class="btn btn-primary">
+                                <i class="fas fa-shopping-bag me-2"></i>Începe să cumperi
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if items %}
+                <div class="col-lg-4">
+                    <div class="cart-summary">
+                        <h4 class="mb-3">Sumar comandă</h4>
+                        
+                        <div class="summary-row">
+                            <span>Subtotal ({{ cos.total_produse }} {% if cos.total_produse == 1 %}produs{% else %}produse{% endif %})</span>
+                            <span>{{ cos.total_pret }} RON</span>
+                        </div>
+                        
+                        <div class="summary-row">
+                            <span>Transport</span>
+                            <span>
+                                {% if cos.cost_transport == 0 %}
+                                    <span class="text-success">GRATUIT</span>
+                                {% else %}
+                                    {{ cos.cost_transport }} RON
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span>{{ cos.total_cu_transport }} RON</span>
+                        </div>
+                        
+                        {% if cos.cost_transport > 0 %}
+    <div class="shipping-notice">
+        <i class="fas fa-truck me-2"></i>
+        <small>
+            Transport gratuit pentru comenzi de peste 100 RON!
+            {% if remaining_for_free_shipping > 0 %}
+                Îți mai trebuie {{ remaining_for_free_shipping|floatformat:2 }} RON.
+            {% endif %}
+        </small>
+    </div>
+{% else %}
+    <div class="shipping-notice free">
+        <i class="fas fa-check-circle me-2"></i>
+        <small>Felicitări! Ai transport gratuit!</small>
+    </div>
+{% endif %}
+                        
+                        <a href="{% url 'checkout' %}" class="checkout-btn">
+                            <i class="fas fa-credit-card me-2"></i>Finalizează comanda
+                        </a>
+                        
+                        <div class="text-center">
+                            <a href="{% url 'lista_produse' %}" class="continue-shopping">
+                                <i class="fas fa-arrow-left me-2"></i>Continuă cumpărăturile
+                            </a>
+                        </div>
+                        
+                        <div class="mt-3 text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                Plăți securizate și transport rapid
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 Țările Lumii. Toate drepturile rezervate.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function increaseQuantity(itemId) {
+            const input = document.getElementById(`quantity-${itemId}`);
+            const currentValue = parseInt(input.value);
+            if (currentValue < 10) {
+                input.value = currentValue + 1;
+            }
+        }
+
+        function decreaseQuantity(itemId) {
+            const input = document.getElementById(`quantity-${itemId}`);
+            const currentValue = parseInt(input.value);
+            if (currentValue > 1) {
+                input.value = currentValue - 1;
+            }
+        }
+
+        function removeItem(itemId) {
+            if (confirm('Ești sigur că vrei să elimini acest produs din coș?')) {
+                fetch(`{% url 'sterge_din_cos' 0 %}`.replace('0', itemId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('A apărut o eroare. Te rog încearcă din nou.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('A apărut o eroare. Te rog încearcă din nou.');
+                });
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

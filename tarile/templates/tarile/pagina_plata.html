@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plată - Țările Lumii</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .payment-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+        }
+
+        .form-section {
+            padding: 30px;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .card-input {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>') no-repeat right 12px center;
+            background-size: 20px;
+            padding-right: 45px;
+        }
+
+        .order-summary {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid #dee2e6;
+            margin-top: 15px;
+            padding-top: 15px;
+            font-weight: bold;
+            font-size: 20px;
+            color: #2c3e50;
+        }
+
+        .pay-now-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .pay-now-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .pay-now-btn:disabled {
+            background: #6c757d;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .security-notice {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .method-card {
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #f8f9ff;
+        }
+
+        .method-card.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .card-logos {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .card-logo {
+            width: 40px;
+            height: 25px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group-text {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .form-section {
+                padding: 20px;
+            }
+            
+            .payment-header {
+                padding: 15px 20px;
+            }
+            
+            .order-summary {
+                position: static;
+                margin-top: 20px;
+            }
+        }
+
+        .loading-spinner {
+            display: none;
+            margin-right: 10px;
+        }
+
+        .ramburs-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .ramburs-info h5 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .ramburs-info p {
+            color: #856404;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'lista_tari' %}">Țările Lumii</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'checkout' %}">
+                    <i class="fas fa-arrow-left me-1"></i>Înapoi la checkout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'lista_tari' %}">Acasă</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'vezi_cos' %}">Coș</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'checkout' %}">Checkout</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Plată</li>
+            </ol>
+        </nav>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="payment-container">
+                    <div class="payment-header">
+                        <h2 class="mb-0">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Plată sigură
+                        </h2>
+                        <p class="mb-0 mt-2">Comanda #{{ comanda.numar_comanda }}</p>
+                    </div>
+
+                    <div class="form-section">
+                        {% if comanda.metoda_plata == 'card' %}
+                            <!-- Plată cu cardul -->
+                            <div class="method-card active">
+                                <h4 class="section-title">
+                                    <i class="fas fa-credit-card"></i>
+                                    Plată cu cardul
+                                </h4>
+                                
+                                <form id="payment-form" method="post" action="{% url 'proceseaza_plata' comanda.id %}">
+                                    {% csrf_token %}
+                                    
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <label for="numar_card" class="form-label">
+                                                Numărul cardului <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" class="form-control card-input" id="numar_card" name="numar_card" 
+                                                   placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                            <div class="card-logos">
+                                                <div class="card-logo">VISA</div>
+                                                <div class="card-logo">MC</div>
+                                                <div class="card-logo">AMEX</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6 mb-3">
+                                            <label for="data_expirare" class="form-label">
+                                                Data expirării <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" class="form-control" id="data_expirare" name="data_expirare" 
+                                                   placeholder="MM/AA" maxlength="5" required>
+                                        </div>
+                                        
+                                        <div class="col-md-6 mb-3">
+                                            <label for="cvv" class="form-label">
+                                                CVV <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" class="form-control" id="cvv" name="cvv" 
+                                                   placeholder="123" maxlength="3" required>
+                                        </div>
+                                        
+                                        <div class="col-12 mb-3">
+                                            <label for="nume_card" class="form-label">
+                                                Numele de pe card <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" class="form-control" id="nume_card" name="nume_card" 
+                                                   placeholder="NUME PRENUME" style="text-transform: uppercase;" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" class="pay-now-btn" id="pay-btn">
+                                        <div class="loading-spinner spinner-border spinner-border-sm" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <i class="fas fa-lock me-2"></i>
+                                        Plătește {{ comanda.total }} RON
+                                    </button>
+                                </form>
+                            </div>
+                            
+                        {% elif comanda.metoda_plata == 'ramburs' %}
+                            <!-- Plată ramburs -->
+                            <div class="ramburs-info">
+                                <h5>
+                                    <i class="fas fa-truck me-2"></i>
+                                    Plată la livrare (Ramburs)
+                                </h5>
+                                <p class="mb-3">
+                                    Veți plăti suma de <strong>{{ comanda.total }} RON</strong> direct curierului la livrare.
+                                    Taxa de ramburs de 5 RON este inclusă în total.
+                                </p>
+                                
+                                <form method="post" action="{% url 'proceseaza_plata' comanda.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="pay-now-btn">
+                                        <i class="fas fa-check me-2"></i>
+                                        Confirmă comanda
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+
+                        <!-- Securitate -->
+                        <div class="security-notice">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            <strong>Plată 100% securizată</strong><br>
+                            <small>Datele tale sunt protejate prin criptare SSL de 256 biți</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <h4 class="mb-3">
+                        <i class="fas fa-receipt me-2"></i>
+                        Rezumatul comenzii
+                    </h4>
+                    
+                    <!-- Detalii livrare -->
+                    <div class="mb-4">
+                        <h6 class="mb-2">
+                            <i class="fas fa-shipping-fast me-2"></i>
+                            Livrare către:
+                        </h6>
+                        <div class="small text-muted">
+                            <strong>{{ comanda.nume_complet }}</strong><br>
+                            {{ comanda.adresa }}<br>
+                            {{ comanda.oras }}, {{ comanda.judet }} {{ comanda.cod_postal }}<br>
+                            <i class="fas fa-phone me-1"></i> {{ comanda.telefon }}<br>
+                            <i class="fas fa-envelope me-1"></i> {{ comanda.email }}
+                        </div>
+                    </div>
+                    
+                    <!-- Produse comandate -->
+                    <div class="mb-4">
+                        <h6 class="mb-2">
+                            <i class="fas fa-box me-2"></i>
+                            Produse comandate:
+                        </h6>
+                        {% for item in comanda.items.all %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="small">
+                                    <strong>{{ item.nume_produs }}</strong><br>
+                                    <span class="text-muted">{{ item.cantitate }}x {{ item.pret_unitar }} RON</span>
+                                </div>
+                                <div class="fw-bold">
+                                    {{ item.total_pret }} RON
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Totaluri -->
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span>{{ comanda.subtotal }} RON</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Transport:</span>
+                        <span>
+                            {% if comanda.cost_transport == 0 %}
+                                <span class="text-success">GRATUIT</span>
+                            {% else %}
+                                {{ comanda.cost_transport }} RON
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="summary-row total">
+                        <span>Total de plată:</span>
+                        <span>{{ comanda.total }} RON</span>
+                    </div>
+                    
+                    <!-- Informații suplimentare -->
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="mb-2">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Informații utile
+                        </h6>
+                        <ul class="list-unstyled mb-0 small">
+                            <li><i class="fas fa-truck me-2 text-primary"></i>Livrare estimată: {{ comanda.data_livrare_estimata|date:"d.m.Y" }}</li>
+                            <li><i class="fas fa-undo me-2 text-primary"></i>Retur gratuit în 30 de zile</li>
+                            <li><i class="fas fa-headset me-2 text-primary"></i>Suport clienți 24/7</li>
+                            {% if comanda.observatii_livrare %}
+                                <li><i class="fas fa-comment me-2 text-primary"></i>{{ comanda.observatii_livrare }}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;">
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Se procesează plata...</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Formatare număr card
+        document.getElementById('numar_card')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            
+            e.target.value = formattedValue;
+        });
+
+        // Formatare data expirare
+        document.getElementById('data_expirare')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // Permite doar cifre pentru CVV
+        document.getElementById('cvv')?.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+
+        // Formatare nume (uppercase)
+        document.getElementById('nume_card')?.addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase();
+        });
+
+        // Procesare formular plată
+        document.getElementById('payment-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = this;
+            const formData = new FormData(form);
+            const submitBtn = document.getElementById('pay-btn');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+            
+            // Validare de bază
+            const numarCard = document.getElementById('numar_card').value.replace(/\s/g, '');
+            const dataExpirare = document.getElementById('data_expirare').value;
+            const cvv = document.getElementById('cvv').value;
+            const numeCard = document.getElementById('nume_card').value.trim();
+            
+            if (numarCard.length < 16) {
+                showAlert('Numărul cardului trebuie să aibă cel puțin 16 cifre', 'danger');
+                return;
+            }
+            
+            if (!/^\d{2}\/\d{2}$/.test(dataExpirare)) {
+                showAlert('Data expirării trebuie să fie în formatul MM/AA', 'danger');
+                return;
+            }
+            
+            if (cvv.length !== 3) {
+                showAlert('CVV-ul trebuie să aibă 3 cifre', 'danger');
+                return;
+            }
+            
+            if (!numeCard) {
+                showAlert('Numele de pe card este obligatoriu', 'danger');
+                return;
+            }
+            
+            // Afișează loading
+            submitBtn.disabled = true;
+            spinner.style.display = 'inline-block';
+            document.getElementById('loading-overlay').style.display = 'block';
+            
+            // Trimite cererea
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 2000);
+                } else {
+                    showAlert(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('A apărut o eroare de conexiune. Vă rugăm să încercați din nou.', 'danger');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                spinner.style.display = 'none';
+                document.getElementById('loading-overlay').style.display = 'none';
+            });
+        });
+
+        // Afișarea alertelor
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.row'));
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Simulare validare card în timp real
+        document.getElementById('numar_card')?.addEventListener('blur', function() {
+            const numar = this.value.replace(/\s/g, '');
+            if (numar.length > 0 && numar.length < 16) {
+                this.classList.add('is-invalid');
+                showAlert('Numărul cardului pare a fi incomplet', 'warning');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    </script>
+</body>
+</html>

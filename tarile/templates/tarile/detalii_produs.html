@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ produs.nume }} - Țările Lumii</title>
+   
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+       
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+        
+        .dropdown-menu {
+            background-color: #343a40;
+            border: 1px solid #495057;
+        }
+        
+        .dropdown-item {
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #495057;
+            color: #fff;
+        }
+
+        .breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        .product-detail-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .carousel-container {
+            position: sticky;
+            top: 20px;
+        }
+
+        .product-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .product-info {
+            padding: 30px;
+        }
+
+        .product-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .stars {
+            color: #ffc107;
+            margin-right: 10px;
+        }
+
+        .rating-text {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .price-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .price-current {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .price-old {
+            font-size: 18px;
+            text-decoration: line-through;
+            opacity: 0.8;
+            margin-right: 15px;
+        }
+
+        .discount-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .stock-status {
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .in-stock {
+            color: #27ae60;
+        }
+
+        .out-of-stock {
+            color: #e74c3c;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .quantity-btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .quantity-input {
+            width: 80px;
+            height: 40px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            border-left: none;
+            border-right: none;
+        }
+
+        .add-to-cart-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .add-to-cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .add-to-cart-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .wishlist-btn {
+            background: none;
+            border: 2px solid #dc3545;
+            color: #dc3545;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .wishlist-btn:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .product-tabs {
+            margin-top: 40px;
+        }
+
+        .nav-tabs .nav-link {
+            color: #495057;
+            font-weight: 600;
+            border: none;
+            border-bottom: 3px solid transparent;
+            padding: 15px 20px;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+            background: none;
+        }
+
+        .tab-content {
+            padding: 30px 0;
+        }
+
+        .specifications-table {
+            background: white;
+            border-radius: 8px;
+        }
+
+        .specifications-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            width: 30%;
+        }
+
+        .similar-products {
+            margin-top: 50px;
+        }
+
+        .similar-product-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .similar-product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .similar-product-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .similar-product-info {
+            padding: 15px;
+        }
+
+        .similar-product-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .similar-product-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .product-info {
+                padding: 20px;
+            }
+            
+            .product-title {
+                font-size: 24px;
+            }
+            
+            .price-current {
+                font-size: 28px;
+            }
+            
+            .carousel-container {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'lista_tari' %}">Țările Lumii</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="magazinDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Magazin
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="magazinDropdown">
+                            <li><a class="dropdown-item" href="{% url 'lista_produse' %}">Vezi toate produsele</a></li>
+                            <li><a class="dropdown-item" href="#">Suveniruri</a></li>
+                            <li><a class="dropdown-item" href="#">Rezervă o vacanță</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                </ul>
+               
+                <form class="d-flex ms-auto" action="{% url 'cauta_tara' %}" method="GET">
+                    <input class="form-control me-2" type="search" placeholder="Caută țară..." name="q" aria-label="Search">
+                    <button class="btn btn-light" type="submit">Caută</button>
+                </form>
+                
+                <ul class="navbar-nav ms-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'vezi_cos' %}">
+                            <i class="fas fa-shopping-cart"></i>
+                            Coș
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'lista_tari' %}">Acasă</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'lista_produse' %}">Produse</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ produs.nume }}</li>
+            </ol>
+        </nav>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Product Detail -->
+        <div class="product-detail-container">
+            <div class="row">
+                <!-- Images Carousel -->
+                <div class="col-lg-6">
+                    <div class="carousel-container p-4">
+                        <!-- Imagine principală -->
+                        {% if produs.imagine_principala %}
+                            <img src="{{ produs.imagine_principala.url }}" alt="{{ produs.nume }}" class="product-image">
+                        {% else %}
+                            <div class="d-flex align-items-center justify-content-center bg-light rounded" style="height: 400px;">
+                                <i class="fas fa-image fa-5x text-muted"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="col-lg-6">
+                    <div class="product-info">
+                        <h1 class="product-title">{{ produs.nume }}</h1>
+
+                        {% if produs.rating > 0 %}
+                            <div class="product-rating">
+                                <div class="stars">
+                                    {% with produs.rating|floatformat:0|add:0 as rating_int %}
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= rating_int %}
+                                                <i class="fas fa-star"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endwith %}
+                                </div>
+                                <span class="rating-text">
+                                    {{ produs.rating }}/5 ({{ produs.numar_reviewuri }} review{% if produs.numar_reviewuri != 1 %}uri{% endif %})
+                                </span>
+                            </div>
+                        {% endif %}
+
+                        <!-- Price Section -->
+                        <div class="price-section">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    {% if produs.pret_redus and produs.pret_redus < produs.pret %}
+                                        <div class="price-current">{{ produs.pret_redus }} RON</div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="price-old">{{ produs.pret }} RON</span>
+                                            <span class="discount-badge">-{{ produs.discount_percent }}%</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="price-current">{{ produs.pret }} RON</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="stock-status">
+                                {% if produs.in_stoc %}
+                                    <span class="in-stock">
+                                        <i class="fas fa-check-circle me-2"></i>În stoc
+                                    </span>
+                                {% else %}
+                                    <span class="out-of-stock">
+                                        <i class="fas fa-times-circle me-2"></i>Stoc epuizat
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Formularul pentru adăugare în coș -->
+                        {% if produs.in_stoc %}
+                            <form method="post" action="{% url 'adauga_in_cos' produs.id %}">
+                                {% csrf_token %}
+                                <div class="quantity-selector">
+                                    <span class="me-3 fw-bold">Cantitate:</span>
+                                    <div class="d-flex">
+                                        <button type="button" class="quantity-btn" onclick="decreaseQuantity()">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" id="quantity" name="cantitate" class="quantity-input" value="1" min="1" max="10">
+                                        <button type="button" class="quantity-btn" onclick="increaseQuantity()">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="add-to-cart-btn">
+                                    <i class="fas fa-shopping-cart me-2"></i>Adaugă în coș
+                                </button>
+                            </form>
+                        {% else %}
+                            <button class="add-to-cart-btn" disabled>
+                                <i class="fas fa-times me-2"></i>Stoc epuizat
+                            </button>
+                        {% endif %}
+
+                        <button class="wishlist-btn">
+                            <i class="far fa-heart me-2"></i>Adaugă la favorite
+                        </button>
+
+                        <!-- Product Description -->
+                        {% if produs.descriere %}
+                            <div class="mt-4">
+                                <h5>Descriere:</h5>
+                                <p class="text-muted">{{ produs.descriere }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Tabs (Detailed Description, Specifications, etc.) -->
+        <div class="product-tabs">
+            <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                {% if produs.descriere_detaliata %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">
+                            Descriere detaliată
+                        </button>
+                    </li>
+                {% endif %}
+                
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if not produs.descriere_detaliata %}active{% endif %}" id="specifications-tab" data-bs-toggle="tab" data-bs-target="#specifications" type="button" role="tab">
+                        Specificații
+                    </button>
+                </li>
+                
+                {% if produs.instructiuni_utilizare %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="instructions-tab" data-bs-toggle="tab" data-bs-target="#instructions" type="button" role="tab">
+                            Instrucțiuni
+                        </button>
+                    </li>
+                {% endif %}
+            </ul>
+            
+            <div class="tab-content" id="productTabsContent">
+                {% if produs.descriere_detaliata %}
+                    <div class="tab-pane fade show active" id="description" role="tabpanel">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                {{ produs.descriere_detaliata|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="tab-pane fade {% if not produs.descriere_detaliata %}show active{% endif %}" id="specifications" role="tabpanel">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <table class="table specifications-table">
+                                <tbody>
+                                    {% if produs.dimensiuni %}
+                                        <tr>
+                                            <th>Dimensiuni</th>
+                                            <td>{{ produs.dimensiuni }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    {% if produs.greutate %}
+                                        <tr>
+                                            <th>Greutate</th>
+                                            <td>{{ produs.greutate }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    {% if produs.material %}
+                                        <tr>
+                                            <th>Material</th>
+                                            <td>{{ produs.material }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    {% if produs.tara_origine %}
+                                        <tr>
+                                            <th>Țara de origine</th>
+                                            <td>{{ produs.tara_origine }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    {% if produs.garantie %}
+                                        <tr>
+                                            <th>Garanție</th>
+                                            <td>{{ produs.garantie }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    {% if produs.categorie %}
+                                        <tr>
+                                            <th>Categorie</th>
+                                            <td>{{ produs.categorie }}</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if produs.instructiuni_utilizare %}
+                    <div class="tab-pane fade" id="instructions" role="tabpanel">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                {{ produs.instructiuni_utilizare|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Similar Products -->
+        {% if produse_similare %}
+            <div class="similar-products">
+                <h3 class="mb-4">Produse similare</h3>
+                <div class="row">
+                    {% for produs_similar in produse_similare %}
+                        <div class="col-md-3 mb-4">
+                            <a href="{% url 'detalii_produs' produs_similar.id %}" class="similar-product-card d-block">
+                                {% if produs_similar.imagine_principala %}
+                                    <img src="{{ produs_similar.imagine_principala.url }}" alt="{{ produs_similar.nume }}" class="similar-product-img">
+                                {% else %}
+                                    <div class="similar-product-img d-flex align-items-center justify-content-center bg-light">
+                                        <i class="fas fa-image fa-2x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="similar-product-info">
+                                    <h6 class="similar-product-title">{{ produs_similar.nume }}</h6>
+                                    <div class="d-flex align-items-center">
+                                        {% if produs_similar.pret_redus and produs_similar.pret_redus < produs_similar.pret %}
+                                            <span class="similar-product-price">{{ produs_similar.pret_redus }} RON</span>
+                                            <small class="text-muted text-decoration-line-through ms-2">{{ produs_similar.pret }} RON</small>
+                                        {% else %}
+                                            <span class="similar-product-price">{{ produs_similar.pret }} RON</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 Țările Lumii. Toate drepturile rezervate.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function increaseQuantity() {
+            const input = document.getElementById('quantity');
+            const currentValue = parseInt(input.value);
+            if (currentValue < 10) {
+                input.value = currentValue + 1;
+            }
+        }
+
+        function decreaseQuantity() {
+            const input = document.getElementById('quantity');
+            const currentValue = parseInt(input.value);
+            if (currentValue > 1) {
+                input.value = currentValue - 1;
+            }
+        }
+    </script>
+</body>
+</html>

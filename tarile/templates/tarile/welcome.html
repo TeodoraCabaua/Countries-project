@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bine ați venit - Țările Lumii</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5e8d3;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .welcome-card {
+            max-width: 600px;
+            padding: 40px;
+            text-align: center;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .welcome-btn {
+            margin-top: 20px;
+            padding: 10px 30px;
+            font-size: 18px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .welcome-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .welcome-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="welcome-card">
+            <h1 class="mb-3">Bine ai venit!</h1>
+            <p class="lead mb-4">Descoperă țările lumii, cu informații detaliate și imagini fascinante.</p>
+            {% if globe_image %}
+            <img src="{% static 'img/globe.jpg' %}" class="welcome-image" alt="Globul pământesc">
+            {% endif %}
+            <p>Dă click aici ca să intri pe site:</p>
+            <a href="{% url 'lista_tari' %}" class="btn btn-primary welcome-btn">Aici</a>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

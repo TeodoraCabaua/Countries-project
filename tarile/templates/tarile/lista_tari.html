@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Țările lumii</title>
+   
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5e8d3;
+            background-image: url("{% static 'img/background.jpg' %}");
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+       
+        .product-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .product-img {
+            height: 200px;
+            object-fit: cover;
+        }
+       
+        .main-content {
+            width: 100%;
+            position: relative;
+        }
+       
+        .page-title {
+            font-weight: bold;
+        }
+        
+        .currency-filter {
+            background-color: #f8f9fa;
+            padding: 20px 0;
+            margin-top: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .currency-btn {
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        
+        .currency-btn.active {
+            background-color: #198754;
+            color: white;
+            border-color: #198754;
+        }
+        
+        #filtered-countries {
+            margin-top: 20px;
+        }
+        
+        #currency-buttons {
+            max-width: 90%;
+            margin: 0 auto;
+        }
+
+        /* Add this to ensure content is readable over the background */
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Make navbar stand out from background */
+        .navbar {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Make footer stand out from background */
+        footer {
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Custom styles for dropdown menu */
+        .dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+        
+        .dropdown-menu {
+            background-color: #343a40;
+            border: 1px solid #495057;
+        }
+        
+        .dropdown-item {
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #495057;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'lista_tari' %}">Țările Lumii</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- Navigation menu -->
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="magazinDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Magazin
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="magazinDropdown">
+                                <a class="dropdown-item" href="{% url 'lista_produse' %}">Vezi toate produsele</a>
+                                <li><a class="dropdown-item" href="#">Suveniruri</a></li>
+                                <li><a class="dropdown-item" href="#">Rezervă o vacanță</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                   
+                    <!-- Search bar -->
+                    <form class="d-flex ms-auto" action="{% url 'cauta_tara' %}" method="GET">
+                        <input class="form-control me-2" type="search" placeholder="Caută țară..." name="q" aria-label="Search">
+                        <button class="btn btn-light" type="submit">Caută</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+       
+        <div class="container mt-4">
+            <h1 class="text-center mb-4 page-title">Țări ale lumii</h1>
+         
+            <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+                {% for tara in tari %}
+                <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3  country-card" data-moneda="{{ tara.moneda }}">
+                    <div class="card h-100 product-card">
+                        <a href="{% url 'detalii_tara' tara.id %}" class="text-decoration-none">
+                            {% if tara.imagine_principala %}
+                            <img src="{{ tara.imagine_principala.url }}" class="card-img-top product-img" alt="{{ tara.nume }}">
+                            {% else %}
+                            <img src="{% static 'img/placeholder.jpg' %}" class="card-img-top product-img" alt="Imagine indisponibilă">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title text-dark">{{ tara.nume }}</h5>
+                                <p class="card-text text-muted">Capitala: {{ tara.capitala }}</p>
+                                <p class="card-text text-muted">Moneda: {{ tara.moneda }}</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Filtru de monede -->
+            <div class="currency-filter mt-5">
+                <h3 class="text-center mb-3">Filtrează după monedă</h3>
+                <div class="d-flex justify-content-center flex-wrap" id="currency-buttons">
+                    <button class="btn btn-outline-secondary currency-btn active" data-moneda="all">Toate</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="RON">RON</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="RUB">RUB</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="UAH">UAH</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="EUR">EUR</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="KR">KR</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="NOK">NOK</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="ZL">ZL</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="GPB">GPB</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="BYN">BYN</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="BGN">BGN</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="ISK">ISK</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="HUF">HUF</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="CZK">CZK</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="RSD">RSD</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="BAM">BAM</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="CHF">CHF</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="DKK">DKK</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="MDL">MDL</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="TRY">TRY</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="MKD">MKD</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="AZN">AZN</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="GEL">GEL</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="AMD">AMD</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="JOD">JOD</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="IRR">IRR</button>
+                    <button class="btn btn-outline-secondary currency-btn" data-moneda="EGP">EGP</button>
+                </div>
+                
+                <div id="filtered-countries" class="mt-4">
+                    
+                </div>
+            </div>
+        </div>
+       
+        <footer class="bg-dark text-white mt-5 py-3">
+            <div class="container text-center">
+                <p>&copy; 2025 Țările Lumii</p>
+            </div>
+        </footer>
+    </div>
+   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Selectăm toate butoanele de monedă
+            const currencyButtons = document.querySelectorAll('.currency-btn');
+            // Selectăm toate cardurile de țări
+            const countryCards = document.querySelectorAll('.country-card');
+            const filteredCountriesDiv = document.getElementById('filtered-countries');
+            
+            // Colectăm toate monedele disponibile din carduri
+            const availableCurrencies = new Set();
+            countryCards.forEach(card => {
+                availableCurrencies.add(card.dataset.moneda);
+            });
+            
+            console.log("Monede disponibile în setul de date:", Array.from(availableCurrencies));
+            
+            function showFilteredCountries(currency) {
+                filteredCountriesDiv.innerHTML = '';
+                
+                if (currency === 'all') {
+                    filteredCountriesDiv.innerHTML = '<p class="text-center">Se afișează toate țările. Selectați o monedă pentru a filtra lista.</p>';
+                    return;
+                }
+                
+                // Verificăm dacă moneda este disponibilă în cardurile actuale
+                let monedaExista = false;
+                countryCards.forEach(card => {
+                    if (card.dataset.moneda === currency) {
+                        monedaExista = true;
+                    }
+                });
+                
+                // Dacă moneda nu există în carduri, afișăm un mesaj special
+                if (!monedaExista) {
+                    filteredCountriesDiv.innerHTML = `
+                        <div class="alert alert-info text-center" role="alert">
+                            Nu există încă țări cu moneda ${currency} în baza de date. 
+                            <br>Poți adăuga țări cu această monedă din panoul de administrare.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Găsește țările cu moneda selectată
+                const filteredCountries = [];
+                countryCards.forEach(card => {
+                    if (card.dataset.moneda === currency) {
+                        const countryName = card.querySelector('.card-title').textContent;
+                        let capital = "";
+                        const cardTexts = card.querySelectorAll('.card-text');
+                        cardTexts.forEach(text => {
+                            if (text.textContent.includes('Capitala:')) {
+                                capital = text.textContent.replace('Capitala:', '').trim();
+                            }
+                        });
+                        filteredCountries.push({name: countryName, capital: capital});
+                    }
+                });
+                
+                // Afișează rezultatele
+                if (filteredCountries.length > 0) {
+                    // Crează header pentru rezultate
+                    filteredCountriesDiv.innerHTML = `
+                        <h4 class="text-center mb-3">Țări care folosesc moneda ${currency}</h4>
+                    `;
+                    
+                    const resultList = document.createElement('div');
+                    resultList.className = 'row row-cols-1 row-cols-md-3 g-4';
+                    
+                    filteredCountries.forEach(country => {
+                        const countryItem = document.createElement('div');
+                        countryItem.className = 'col';
+                        countryItem.innerHTML = `
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">${country.name}</h5>
+                                    <p class="card-text">Capitala: ${country.capital}</p>
+                                    <p class="card-text">Moneda: ${currency}</p>
+                                </div>
+                            </div>
+                        `;
+                        resultList.appendChild(countryItem);
+                    });
+                    
+                    filteredCountriesDiv.appendChild(resultList);
+                }
+            }
+            
+            // Adăugăm event listener pentru toate butoanele prin delegare de eveniment
+            document.getElementById('currency-buttons').addEventListener('click', function(event) {
+                if (event.target.classList.contains('currency-btn')) {
+                    // Scoate clasa active de pe toate butoanele
+                    currencyButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Adaugă clasa active pe butonul curent
+                    event.target.classList.add('active');
+                    
+                    // Filtrează țările după moneda selectată
+                    const selectedCurrency = event.target.dataset.moneda;
+                    showFilteredCountries(selectedCurrency);
+                }
+            });
+            
+            // Script pentru generarea de butoane pentru monede din baza de date
+            function adaugaButoaneDinBazaDeDate() {
+                const container = document.getElementById('currency-buttons');
+                
+                // Păstrează butonul "Toate" și cele existente
+                // Dar adaugă butoane pentru toate monedele din baza de date
+                availableCurrencies.forEach(moneda => {
+                    // Verifică dacă butonul nu există deja
+                    const existingButton = Array.from(currencyButtons).find(btn => btn.dataset.moneda === moneda);
+                    if (!existingButton && moneda) {
+                        const button = document.createElement('button');
+                        button.className = 'btn btn-outline-secondary currency-btn';
+                        button.dataset.moneda = moneda;
+                        button.textContent = moneda;
+                        container.appendChild(button);
+                    }
+                });
+            }
+            
+            // funcția pentru a adăuga butoane din baza de date
+            adaugaButoaneDinBazaDeDate();
+            
+            // Inițial afișează toate țările
+            showFilteredCountries('all');
+        });
+    </script>
+</body>
+</html>
